@@ -13,7 +13,7 @@
 <title>balaFUN Касса</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap">
 <style>
 :root{
   color-scheme: dark;
@@ -59,12 +59,13 @@ body{
     linear-gradient(180deg,var(--bg-top),var(--bg-bottom) 70%);
   background-attachment:fixed;
   color:var(--text);
-  font-size:15px;
-  line-height:1.45;
+  font-size:15.5px;
+  line-height:1.5;
+  letter-spacing:.1px;
   -webkit-tap-highlight-color:transparent;
   overscroll-behavior-y:none;
 }
-h1,h2,h3,.display{font-family:'Baloo 2',ui-rounded,'Segoe UI',sans-serif;}
+h1,h2,h3,.display{font-family:'Baloo 2',ui-rounded,'Segoe UI',sans-serif;text-wrap:balance;letter-spacing:.2px;}
 .num{font-variant-numeric:tabular-nums;}
 button{font-family:inherit;}
 :focus-visible{outline:2px solid var(--accent2); outline-offset:2px; border-radius:6px;}
@@ -155,7 +156,7 @@ img{max-width:100%;}
   display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border);
 }
 .line-row:last-child{border-bottom:none;}
-.line-thumb{width:42px;height:42px;border-radius:11px;background:var(--surface-3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;overflow:hidden;}
+.line-thumb{width:44px;height:44px;border-radius:12px;background:linear-gradient(160deg,var(--surface-3),var(--surface-2));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:23px;flex-shrink:0;overflow:hidden;}
 .line-thumb img{width:100%;height:100%;object-fit:cover;}
 .line-info{flex:1;min-width:0;}
 .line-name{font-weight:600;font-size:14px;}
@@ -199,16 +200,17 @@ img{max-width:100%;}
 .item-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .item-card{
   background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);
-  padding:10px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:6px;
+  padding:10px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:7px;
+  box-shadow:var(--shadow-sm);
 }
 .item-card:active{transform:scale(.97);}
 .item-card .thumb{
-  width:100%;aspect-ratio:1.4;border-radius:10px;background:var(--surface-3);
-  display:flex;align-items:center;justify-content:center;font-size:30px;overflow:hidden;
+  width:100%;aspect-ratio:1.3;border-radius:12px;background:linear-gradient(155deg,var(--surface-3),var(--surface-2));
+  display:flex;align-items:center;justify-content:center;font-size:42px;overflow:hidden;
 }
 .item-card .thumb img{width:100%;height:100%;object-fit:cover;}
-.item-card .nm{font-size:13px;font-weight:600;line-height:1.25;}
-.item-card .pr{font-weight:700;color:var(--accent);font-size:13px;}
+.item-card .nm{font-size:13.5px;font-weight:600;line-height:1.28;}
+.item-card .pr{font-weight:700;color:var(--accent);font-size:13.5px;}
 
 /* ---------- overlay (picker) ---------- */
 .overlay{
@@ -265,7 +267,7 @@ img{max-width:100%;}
 .cat-block-body{padding:0 14px 12px;display:none;}
 .cat-block-body.open{display:block;}
 .menu-item-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--border);}
-.menu-item-row .thumb{width:36px;height:36px;border-radius:9px;background:var(--surface-3);display:flex;align-items:center;justify-content:center;font-size:17px;overflow:hidden;flex-shrink:0;}
+.menu-item-row .thumb{width:40px;height:40px;border-radius:11px;background:linear-gradient(160deg,var(--surface-3),var(--surface-2));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden;flex-shrink:0;}
 .menu-item-row .thumb img{width:100%;height:100%;object-fit:cover;}
 .menu-item-row .nm{flex:1;font-size:13.5px;font-weight:600;}
 .menu-item-row .pr{font-size:13px;color:var(--text-dim);}
@@ -489,85 +491,6 @@ const SEED = [
 ["Супы","🍜",[["Пельмени с бульоном",2500],["Рамен с пашотом",3300],["Суп-лапша по-домашнему",2100],["Суп фрикадельки с говядиной",2500],["Том-ям",3800],["Шурпа с говядиной",2500]]]
 ];
 
-const PHOTO_MAP = {
-  'Маргарита':'photos/margherita.jpg',
-  'Пепперони':'photos/pepperoni.jpg',
-  'Болоньезе':'photos/bolognese.jpg',
-  'Греческий':'photos/greek-salad.jpg',
-  'Цезарь с курицей':'photos/caesar-salad.jpg',
-  'Эспрессо':'photos/espresso.jpg',
-  'Капучино':'photos/cappuccino.jpg',
-  'Латте':'photos/latte.jpg',
-  'Калифорния':'photos/california-roll.jpg',
-  'Мохито':'photos/mojito.jpg',
-  'Том-ям':'photos/tom-yum.jpg',
-  'Бургер с говядиной':'photos/beef-burger.jpg',
-  'Айс-капучино':'photos/iced-cappuccino.jpg',
-  'Айс-Американо':'photos/iced-americano.jpg',
-  'Гранат':'photos/pomegranate-lemonade.jpg',
-  'Манго-маракуйя':'photos/mango-passion.jpg',
-  'Ягодный микс':'photos/berry-lemonade.jpg',
-  'Клубника':'photos/strawberry-milkshake.jpg',
-  'Орео':'photos/oreo-milkshake.jpg',
-  'Сникерс':'photos/chocolate-milkshake.jpg',
-  'Шоколад':'photos/chocolate-milkshake.jpg',
-  'Американо':'photos/americano.jpg',
-  'Бамбл-кофе':'photos/coffee-cup.jpg',
-  'Какао':'photos/cocoa.jpg',
-  'Латте макиато':'photos/latte-macchiato.jpg',
-  'Флэт уайт':'photos/flat-white.jpg',
-  'Фраппучино':'photos/frappuccino.jpg',
-  'Марокканский чай':'photos/moroccan-tea.jpg',
-  'Облепиховый чай с апельсином':'photos/orange-tea.jpg',
-  'Тары чай':'photos/black-tea.jpg',
-  'Ташкентский чай':'photos/black-tea.jpg',
-  'Чёрный чай':'photos/black-tea.jpg',
-  'Чай с молоком':'photos/milk-tea.jpg',
-  'Куриный (200 гр.)':'photos/chicken-skewer.jpg',
-  'Куриные крылышки (250 гр.)':'photos/chicken-wings-grill.jpg',
-  'Говядина (250 гр.)':'photos/beef-skewer.jpg',
-  'Антрекот (300 гр.)':'photos/steak.jpg',
-  'Говяжьи котлеты с пюре':'photos/beef-cutlet-mash.jpg',
-  'Куриные котлеты с пюре':'photos/chicken-cutlet-mash.jpg',
-  'Куриная грудка с грибным соусом':'photos/chicken-mushroom-sauce.jpg',
-  'Лагман жареный':'photos/fried-noodles.jpg',
-  'Манты из рубленой говядины':'photos/dumplings-steamed.jpg',
-  'Манты (банкетное)':'photos/dumplings-steamed.jpg',
-  'Плов ташкентский':'photos/pilaf.jpg',
-  'Праздничный плов':'photos/pilaf.jpg',
-  'Фарфалле с сёмгой':'photos/pasta-salmon.jpg',
-  'Феттучини с курицей и грибами в сливочном соусе':'photos/fettuccine-chicken.jpg',
-  'Дракон':'photos/dragon-roll.jpg',
-  'Ролл с лососем':'photos/salmon-roll2.jpg',
-  'Ролл темпура с креветками':'photos/shrimp-tempura-roll.jpg',
-  'Ролл темпура с лососем':'photos/salmon-tempura-roll.jpg',
-  'Филадельфия':'photos/philadelphia-roll2.jpg',
-  'Димлама':'photos/stew-pot.jpg',
-  'Лепёшки':'photos/flatbread.jpg',
-  'Мини-самса с говядиной':'photos/samosa2.jpg',
-  'Мини-чебуреки':'photos/chebureki2.jpg',
-  'С копчёной говядиной':'photos/meat-pizza.jpg',
-  'Сырная':'photos/cheese-pizza2.jpg',
-  'Фирменная':'photos/specialty-pizza.jpg',
-  'Бургер с курицей':'photos/chicken-burger.jpg',
-  'Крылышки хрустящие':'photos/crispy-wings.jpg',
-  'Макароны с сыром':'photos/mac-cheese.jpg',
-  'Наггетсы':'photos/nuggets2.jpg',
-  'Сырные палочки':'photos/cheese-sticks.jpg',
-  'Пельмени цветные':'photos/colorful-dumplings.jpg',
-  'Ачучук':'photos/tomato-onion-salad.jpg',
-  'Запечённая тыква со свёклой':'photos/pumpkin-beet-salad.jpg',
-  'Фирменный Balafun':'photos/mixed-salad.jpg',
-  'Хрустящие баклажаны с творожным сыром':'photos/eggplant-salad.jpg',
-  'Цезарь с креветками':'photos/shrimp-caesar.jpg',
-  'Картофельное пюре':'photos/mashed-potato.jpg',
-  'Овощи гриль':'photos/grilled-veg.jpg',
-  'Картофель фри':'photos/fries2.jpg',
-  'Пельмени с бульоном':'photos/dumpling-soup.jpg',
-  'Рамен с пашотом':'photos/ramen.jpg',
-  'Суп фрикадельки с говядиной':'photos/meatball-soup.jpg'
-};
-
 const GROUP_MAP = {
   'Айс-латте':'bar','Лимонады':'bar','Молочные коктейли':'bar','Кофе':'bar','Чай':'bar','Прохладительные напитки':'bar',
   'Шашлыки':'kitchen','Сеты':'kitchen','Горячие блюда':'kitchen','Суши и роллы':'kitchen','Банкетное меню':'kitchen',
@@ -656,7 +579,7 @@ async function init(){
       state.categories.push(cat);
       await idbPut('categories', cat);
       for(const [dishName, price] of dishes){
-        const item = { id: uid(), categoryId: cat.id, name: dishName, price, photo: PHOTO_MAP[dishName] || null };
+        const item = { id: uid(), categoryId: cat.id, name: dishName, price, photo: null };
         state.items.push(item);
         await idbPut('items', item);
       }
@@ -667,13 +590,7 @@ async function init(){
       if(!cat.group){ cat.group = GROUP_MAP[cat.name] || 'kitchen'; await idbPut('categories', cat); }
     }
     for(const item of state.items){
-      const mapped = PHOTO_MAP[item.name];
-      if(item.photo && item.photo.indexOf('photos/')===0){
-        if(mapped && item.photo!==mapped){ item.photo = mapped; await idbPut('items', item); }
-        else if(!mapped){ item.photo = null; await idbPut('items', item); }
-      } else if(!item.photo && mapped){
-        item.photo = mapped; await idbPut('items', item);
-      }
+      if(item.photo && item.photo.indexOf('photos/')===0){ item.photo = null; await idbPut('items', item); }
     }
   }
 
