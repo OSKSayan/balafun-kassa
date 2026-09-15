@@ -305,36 +305,20 @@ img{max-width:100%;}
 .modal-actions{display:flex;gap:10px;margin-top:18px;}
 .modal-actions .btn{flex:1;}
 
-/* ---------- lock screen ---------- */
-#lockScreen,#setupScreen{
+/* ---------- auth screen ---------- */
+#authScreen{
   min-height:calc(100vh - env(safe-area-inset-top));display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:24px 24px calc(24px + env(safe-area-inset-bottom));text-align:center;gap:6px;
 }
-#lockScreen .ufo,#setupScreen .ufo{font-size:52px;margin-bottom:6px;}
-#lockScreen h1,#setupScreen h1{font-size:24px;margin:0;font-weight:800;}
-#lockScreen .who,#setupScreen .who{color:var(--text-dim);font-size:13.5px;margin-bottom:22px;}
+#authScreen .ufo{font-size:52px;margin-bottom:6px;}
+#authScreen h1{font-size:24px;margin:0;font-weight:800;}
+#authScreen .who{color:var(--text-dim);font-size:13.5px;margin-bottom:18px;}
+.auth-tabs{display:flex;gap:6px;background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:4px;margin-bottom:18px;width:100%;max-width:320px;}
+.auth-tab{flex:1;border:none;background:none;color:var(--text-dim);font-weight:700;font-size:13.5px;padding:10px 8px;border-radius:11px;cursor:pointer;}
+.auth-tab.active{background:linear-gradient(180deg,#ffd876,var(--accent));color:var(--accent-ink);}
 .setup-form{width:100%;max-width:320px;text-align:left;display:flex;flex-direction:column;gap:2px;}
 .setup-form .btn{margin-top:8px;}
 .setup-note{color:var(--text-faint);font-size:12px;margin-top:16px;max-width:280px;}
-.pin-dots{display:flex;gap:14px;margin-bottom:26px;}
-.pin-dots span{width:14px;height:14px;border-radius:50%;border:2px solid var(--border-strong);background:transparent;}
-.pin-dots span.filled{background:var(--accent);border-color:var(--accent);}
-.pin-dots.shake{animation:shake .32s;}
-@media (prefers-reduced-motion:reduce){.pin-dots.shake{animation:none;}}
-@keyframes shake{
-  0%,100%{transform:translateX(0);}
-  20%{transform:translateX(-9px);}
-  40%{transform:translateX(8px);}
-  60%{transform:translateX(-6px);}
-  80%{transform:translateX(4px);}
-}
-.numpad{display:grid;grid-template-columns:repeat(3,72px);gap:14px;}
-.numpad button{
-  width:72px;height:72px;border-radius:50%;border:1px solid var(--border);
-  background:var(--surface-2);color:var(--text);font-size:23px;font-weight:700;cursor:pointer;
-}
-.numpad button:active{background:var(--surface-3);transform:scale(.95);}
-.numpad button.ghost{background:none;border:none;color:var(--text-dim);font-size:19px;}
 
 /* ---------- toast ---------- */
 #toast{
@@ -350,32 +334,27 @@ img{max-width:100%;}
 <body>
 
 <div id="app">
-  <div id="lockScreen">
+  <div id="authScreen">
     <div class="ufo">🛸</div>
     <h1>balaFUN Касса</h1>
-    <div class="who" id="lockWho">Официант</div>
-    <div class="pin-dots" id="pinDots">
-      <span></span><span></span><span></span><span></span>
+    <div class="who">Вход в аккаунт</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-mode="login">Войти</button>
+      <button class="auth-tab" data-mode="signup">Создать аккаунт</button>
     </div>
-    <div class="numpad" id="numpad">
-      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
-      <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
-      <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
-      <button class="ghost" data-k="clear">Стереть</button><button data-k="0">0</button><button class="ghost" data-k="back">⌫</button>
+    <div class="setup-form" id="loginForm">
+      <div class="field"><label>Имя пользователя</label><input type="text" id="loginUsername" autocomplete="username" placeholder="Например: sayan"></div>
+      <div class="field"><label>Пароль</label><input type="password" id="loginPassword" autocomplete="current-password" placeholder="••••••••"></div>
+      <button class="btn btn-primary btn-block" id="btnLogin">Войти</button>
     </div>
-  </div>
-
-  <div id="setupScreen" hidden>
-    <div class="ufo">🛸</div>
-    <h1>balaFUN Касса</h1>
-    <div class="who">Это твой первый вход — давай знакомиться</div>
-    <div class="setup-form">
-      <div class="field"><label>Твоё имя</label><input type="text" id="setupName" placeholder="Например: Данияр"></div>
-      <div class="field"><label>Придумай PIN (4 цифры)</label><input type="text" inputmode="numeric" maxlength="4" id="setupPin" placeholder="••••"></div>
-      <div class="field"><label>Повтори PIN</label><input type="text" inputmode="numeric" maxlength="4" id="setupPin2" placeholder="••••"></div>
-      <button class="btn btn-primary btn-block" id="btnSetupStart">Начать работу</button>
+    <div class="setup-form" id="signupForm" hidden>
+      <div class="field"><label>Твоё имя</label><input type="text" id="signupName" placeholder="Например: Данияр"></div>
+      <div class="field"><label>Имя пользователя</label><input type="text" id="signupUsername" autocomplete="username" placeholder="Латиницей, без пробелов"></div>
+      <div class="field"><label>Пароль</label><input type="password" id="signupPassword" autocomplete="new-password" placeholder="Минимум 6 символов"></div>
+      <div class="field"><label>Повтори пароль</label><input type="password" id="signupPassword2" autocomplete="new-password" placeholder="••••••••"></div>
+      <button class="btn btn-primary btn-block" id="btnSignup">Создать аккаунт</button>
     </div>
-    <div class="setup-note">Все твои заказы и настройки останутся только на этом телефоне.</div>
+    <div class="setup-note">Один аккаунт — с любого телефона. Твои заказы и меню видны только тебе.</div>
   </div>
 
   <div id="mainApp" hidden>
@@ -466,6 +445,7 @@ img{max-width:100%;}
   <div id="toast"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
 <script>
 (function(){
 "use strict";
@@ -502,155 +482,157 @@ let state = {
   categories: [],
   items: [],
   orders: [],
-  meta: { key:'settings', pin:'', ownerName:'', orderCounter:0, setupDone:false },
+  meta: { ownerName:'' },
   currentOrderId: null,
   pickerStep: 'groups',
   pickerGroup: 'bar',
   pickerCategoryId: null,
-  menuOpenCategoryId: null,
-  pinBuffer: ''
+  menuOpenCategoryId: null
 };
 
 function uid(){ return (crypto.randomUUID ? crypto.randomUUID() : 'id-'+Date.now()+'-'+Math.random().toString(16).slice(2)); }
 function money(n){ return Math.round(n).toLocaleString('ru-RU') + ' ₸'; }
 
-/* ================= IndexedDB ================= */
-const DB_NAME = 'kassa_balafun', DB_VERSION = 1;
-let dbPromise = null;
-function idbOpen(){
-  if(dbPromise) return dbPromise;
-  dbPromise = new Promise((resolve,reject)=>{
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
-    req.onupgradeneeded = e=>{
-      const db = e.target.result;
-      if(!db.objectStoreNames.contains('categories')) db.createObjectStore('categories',{keyPath:'id'});
-      if(!db.objectStoreNames.contains('items')) db.createObjectStore('items',{keyPath:'id'});
-      if(!db.objectStoreNames.contains('orders')) db.createObjectStore('orders',{keyPath:'id'});
-      if(!db.objectStoreNames.contains('meta')) db.createObjectStore('meta',{keyPath:'key'});
-    };
-    req.onsuccess = ()=>resolve(req.result);
-    req.onerror = ()=>reject(req.error);
-  });
-  return dbPromise;
+/* ================= SUPABASE ================= */
+const SUPABASE_URL = 'https://rmuwabrevzxobapdtgci.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_8aEGpM7re7F9xCoNJEpJtw_h8uCdVL_';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let sbUser = null;
+
+function usernameToEmail(u){
+  const clean = u.trim().toLowerCase().replace(/[^a-z0-9_.-]/g,'');
+  return clean + '@balafun.local';
 }
-async function idbGetAll(store){
-  const db = await idbOpen();
-  return new Promise((resolve,reject)=>{
-    const tx = db.transaction(store,'readonly');
-    const req = tx.objectStore(store).getAll();
-    req.onsuccess = ()=>resolve(req.result);
-    req.onerror = ()=>reject(req.error);
-  });
-}
-async function idbPut(store,val){
-  const db = await idbOpen();
-  return new Promise((resolve,reject)=>{
-    const tx = db.transaction(store,'readwrite');
-    tx.objectStore(store).put(val);
-    tx.oncomplete = ()=>resolve();
-    tx.onerror = ()=>reject(tx.error);
-  });
-}
-async function idbDelete(store,key){
-  const db = await idbOpen();
-  return new Promise((resolve,reject)=>{
-    const tx = db.transaction(store,'readwrite');
-    tx.objectStore(store).delete(key);
-    tx.oncomplete = ()=>resolve();
-    tx.onerror = ()=>reject(tx.error);
-  });
+function friendlyAuthError(err){
+  const m = (err && err.message) || '';
+  if(/invalid login credentials/i.test(m)) return 'Неверное имя пользователя или пароль';
+  if(/already registered|already exists|user already/i.test(m)) return 'Это имя пользователя уже занято';
+  if(/password should be at least|password.*weak|at least 6/i.test(m)) return 'Пароль слишком короткий (минимум 6 символов)';
+  if(/failed to fetch|networkerror|network request failed/i.test(m)) return 'Нет соединения с интернетом';
+  return m || 'Что-то пошло не так';
 }
 
-/* ================= INIT / SEED ================= */
-async function init(){
-  const [cats, items, orders, metaRows] = await Promise.all([
-    idbGetAll('categories'), idbGetAll('items'), idbGetAll('orders'), idbGetAll('meta')
+function catToApp(row){ return { id: row.id, name: row.name, emoji: row.emoji, group: row.grp }; }
+function itemToApp(row){ return { id: row.id, categoryId: row.category_id, name: row.name, price: Number(row.price), photo: row.photo || null }; }
+function orderToApp(row){ return { id: row.id, label: row.label, status: row.status, createdAt: new Date(row.created_at).getTime(), closedAt: row.closed_at ? new Date(row.closed_at).getTime() : null, lines: [] }; }
+function lineToApp(row){ return { id: row.id, itemId: row.item_id, name: row.name, price: Number(row.price), qty: row.qty }; }
+
+async function seedMenuForUser(userId){
+  await Promise.all(SEED.map(async ([catName, emoji, dishes])=>{
+    const { data: cat, error } = await sb.from('categories')
+      .insert({ user_id:userId, name:catName, emoji, grp: GROUP_MAP[catName] || 'kitchen' })
+      .select().single();
+    if(error || !cat) return;
+    const rows = dishes.map(([name,price])=>({ user_id:userId, category_id:cat.id, name, price }));
+    await sb.from('items').insert(rows);
+  }));
+}
+
+async function sbLoadAll(){
+  const [{data:cats}, {data:items}, {data:orders}, {data:lines}, {data:profile}] = await Promise.all([
+    sb.from('categories').select('*'),
+    sb.from('items').select('*'),
+    sb.from('orders').select('*'),
+    sb.from('order_lines').select('*'),
+    sb.from('profiles').select('*').eq('id', sbUser.id).maybeSingle()
   ]);
-  state.categories = cats; state.items = items; state.orders = orders;
-  const metaRow = metaRows.find(m=>m.key==='settings');
-  if(metaRow){
-    if(metaRow.setupDone === undefined) metaRow.setupDone = true;
-    state.meta = metaRow;
-  }
-
-  if(state.categories.length===0){
-    for(const [catName, emoji, dishes] of SEED){
-      const cat = { id: uid(), name: catName, emoji, group: GROUP_MAP[catName] || 'kitchen' };
-      state.categories.push(cat);
-      await idbPut('categories', cat);
-      for(const [dishName, price] of dishes){
-        const item = { id: uid(), categoryId: cat.id, name: dishName, price, photo: null };
-        state.items.push(item);
-        await idbPut('items', item);
-      }
-    }
-    await idbPut('meta', state.meta);
-  } else {
-    for(const cat of state.categories){
-      if(!cat.group){ cat.group = GROUP_MAP[cat.name] || 'kitchen'; await idbPut('categories', cat); }
-    }
-    for(const item of state.items){
-      if(item.photo && item.photo.indexOf('photos/')===0){ item.photo = null; await idbPut('items', item); }
-    }
-  }
-
-  bindEvents();
-  bindSetupEvents();
-  if(!state.meta.setupDone){
-    document.getElementById('lockScreen').hidden = true;
-    document.getElementById('setupScreen').hidden = false;
-  } else {
-    document.getElementById('lockWho').textContent = 'Официант: ' + state.meta.ownerName;
-    renderPinDots();
-  }
+  state.categories = (cats||[]).map(catToApp);
+  state.items = (items||[]).map(itemToApp);
+  const lineRows = lines||[];
+  state.orders = (orders||[]).map(o=>{
+    const ord = orderToApp(o);
+    ord.lines = lineRows.filter(l=>l.order_id===o.id).map(lineToApp);
+    return ord;
+  });
+  state.meta.ownerName = profile ? profile.display_name : '';
 }
 
-/* ================= FIRST-RUN SETUP ================= */
-function bindSetupEvents(){
-  document.getElementById('btnSetupStart').onclick = async ()=>{
-    const name = document.getElementById('setupName').value.trim();
-    const pin = document.getElementById('setupPin').value.trim();
-    const pin2 = document.getElementById('setupPin2').value.trim();
+/* ================= AUTH ================= */
+async function doSignUp(username, password, displayName){
+  const email = usernameToEmail(username);
+  const { data, error } = await sb.auth.signUp({ email, password });
+  if(error) throw error;
+  if(!data.user) throw new Error('Не удалось создать аккаунт');
+  sbUser = data.user;
+  await sb.from('profiles').insert({ id: sbUser.id, display_name: displayName });
+  await seedMenuForUser(sbUser.id);
+}
+async function doSignIn(username, password){
+  const email = usernameToEmail(username);
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if(error) throw error;
+  sbUser = data.user;
+}
+async function doSignOut(){
+  await sb.auth.signOut();
+  sbUser = null;
+  location.reload();
+}
+
+function bindAuthEvents(){
+  document.querySelectorAll('.auth-tab').forEach(t=>{
+    t.onclick = ()=>{
+      document.querySelectorAll('.auth-tab').forEach(x=> x.classList.toggle('active', x===t));
+      document.getElementById('loginForm').hidden = t.dataset.mode!=='login';
+      document.getElementById('signupForm').hidden = t.dataset.mode!=='signup';
+    };
+  });
+  document.getElementById('btnLogin').onclick = async ()=>{
+    const u = document.getElementById('loginUsername').value.trim();
+    const p = document.getElementById('loginPassword').value;
+    if(!u || !p){ showToast('Заполни имя и пароль'); return; }
+    const btn = document.getElementById('btnLogin');
+    btn.disabled = true; const oldLabel = btn.textContent; btn.textContent = 'Входим…';
+    try{
+      await doSignIn(u, p);
+      await afterLogin();
+    } catch(err){
+      showToast(friendlyAuthError(err));
+    } finally {
+      btn.disabled = false; btn.textContent = oldLabel;
+    }
+  };
+  document.getElementById('btnSignup').onclick = async ()=>{
+    const name = document.getElementById('signupName').value.trim();
+    const u = document.getElementById('signupUsername').value.trim();
+    const p = document.getElementById('signupPassword').value;
+    const p2 = document.getElementById('signupPassword2').value;
     if(!name){ showToast('Введи своё имя'); return; }
-    if(!/^\d{4}$/.test(pin)){ showToast('PIN должен быть из 4 цифр'); return; }
-    if(pin !== pin2){ showToast('PIN не совпадает'); return; }
-    state.meta.ownerName = name;
-    state.meta.pin = pin;
-    state.meta.setupDone = true;
-    await idbPut('meta', state.meta);
-    document.getElementById('setupScreen').hidden = true;
-    document.getElementById('lockWho').textContent = 'Официант: ' + state.meta.ownerName;
-    unlock();
+    if(!u){ showToast('Введи имя пользователя'); return; }
+    if(p.length<6){ showToast('Пароль минимум 6 символов'); return; }
+    if(p!==p2){ showToast('Пароли не совпадают'); return; }
+    const btn = document.getElementById('btnSignup');
+    btn.disabled = true; const oldLabel = btn.textContent; btn.textContent = 'Создаём…';
+    try{
+      await doSignUp(u, p, name);
+      await afterLogin();
+    } catch(err){
+      showToast(friendlyAuthError(err));
+    } finally {
+      btn.disabled = false; btn.textContent = oldLabel;
+    }
   };
 }
 
-/* ================= LOCK SCREEN ================= */
-function renderPinDots(){
-  const dots = document.querySelectorAll('#pinDots span');
-  dots.forEach((d,i)=> d.classList.toggle('filled', i < state.pinBuffer.length));
-}
-function handlePinKey(k){
-  if(k==='clear'){ state.pinBuffer=''; renderPinDots(); return; }
-  if(k==='back'){ state.pinBuffer = state.pinBuffer.slice(0,-1); renderPinDots(); return; }
-  if(state.pinBuffer.length>=4) return;
-  state.pinBuffer += k;
-  renderPinDots();
-  if(state.pinBuffer.length===4){
-    if(state.pinBuffer === state.meta.pin){
-      setTimeout(unlock, 120);
-    } else {
-      const dotsWrap = document.getElementById('pinDots');
-      dotsWrap.classList.add('shake');
-      showToast('Неверный PIN');
-      setTimeout(()=>{ dotsWrap.classList.remove('shake'); state.pinBuffer=''; renderPinDots(); }, 320);
-    }
-  }
-}
-function unlock(){
-  document.getElementById('lockScreen').hidden = true;
+/* ================= INIT ================= */
+async function afterLogin(){
+  await sbLoadAll();
+  document.getElementById('authScreen').hidden = true;
   document.getElementById('mainApp').hidden = false;
-  state.pinBuffer='';
   showScreen('orders');
+}
+async function init(){
+  bindEvents();
+  bindAuthEvents();
+  try{
+    const { data:{ session } } = await sb.auth.getSession();
+    if(session && session.user){
+      sbUser = session.user;
+      await afterLogin();
+    }
+  } catch(err){
+    showToast('Не удалось подключиться. Проверь интернет.');
+  }
 }
 
 /* ================= NAVIGATION ================= */
@@ -744,18 +726,13 @@ async function createNewOrder(){
   card.querySelector('#mCancel').onclick = closeModal;
   card.querySelector('#mOk').onclick = async ()=>{
     const val = card.querySelector('#newOrderLabel').value.trim();
-    state.meta.orderCounter = (state.meta.orderCounter||0) + 1;
-    await idbPut('meta', state.meta);
-    const order = {
-      id: uid(),
-      label: val || ('Заказ №'+state.meta.orderCounter),
-      status: 'open',
-      createdAt: Date.now(),
-      closedAt: null,
-      lines: []
-    };
+    const label = val || ('Заказ №'+(state.orders.length+1));
+    const { data, error } = await sb.from('orders')
+      .insert({ user_id: sbUser.id, label, status:'open' })
+      .select().single();
+    if(error || !data){ showToast('Не удалось создать заказ'); return; }
+    const order = orderToApp(data);
     state.orders.push(order);
-    await idbPut('orders', order);
     closeModal();
     openOrderDetail(order.id);
   };
@@ -810,24 +787,35 @@ async function changeLineQty(itemId, delta){
   const line = o.lines.find(l=>l.itemId===itemId);
   if(!line) return;
   line.qty += delta;
-  if(line.qty<=0) o.lines = o.lines.filter(l=>l.itemId!==itemId);
-  await idbPut('orders', o);
+  if(line.qty<=0){
+    o.lines = o.lines.filter(l=>l.itemId!==itemId);
+    await sb.from('order_lines').delete().eq('id', line.id);
+  } else {
+    await sb.from('order_lines').update({ qty: line.qty }).eq('id', line.id);
+  }
   renderOrderDetail();
   if(!document.getElementById('pickerOverlay').hidden) renderPickerTotal();
 }
 async function removeLine(itemId){
   const o = getCurrentOrder();
+  const line = o.lines.find(l=>l.itemId===itemId);
   o.lines = o.lines.filter(l=>l.itemId!==itemId);
-  await idbPut('orders', o);
+  if(line) await sb.from('order_lines').delete().eq('id', line.id);
   renderOrderDetail();
   if(!document.getElementById('pickerOverlay').hidden) renderPickerTotal();
 }
 async function addLine(item){
   const o = getCurrentOrder();
   const existing = o.lines.find(l=>l.itemId===item.id);
-  if(existing) existing.qty += 1;
-  else o.lines.push({ itemId:item.id, name:item.name, price:item.price, qty:1 });
-  await idbPut('orders', o);
+  if(existing){
+    existing.qty += 1;
+    await sb.from('order_lines').update({ qty: existing.qty }).eq('id', existing.id);
+  } else {
+    const { data, error } = await sb.from('order_lines')
+      .insert({ order_id:o.id, user_id:sbUser.id, item_id:item.id, name:item.name, price:item.price, qty:1 })
+      .select().single();
+    if(!error && data) o.lines.push(lineToApp(data));
+  }
   renderOrderDetail();
   renderPickerTotal();
   showToast('+ '+item.name);
@@ -843,7 +831,7 @@ async function renameOrder(){
   card.querySelector('#mCancel').onclick = closeModal;
   card.querySelector('#mOk').onclick = async ()=>{
     const val = card.querySelector('#renameInput').value.trim();
-    if(val){ o.label = val; await idbPut('orders', o); renderOrderDetail(); renderOrders(); }
+    if(val){ o.label = val; await sb.from('orders').update({ label: val }).eq('id', o.id); renderOrderDetail(); renderOrders(); }
     closeModal();
   };
 }
@@ -855,7 +843,7 @@ async function closeCurrentOrder(){
   if(!ok) return;
   o.status = 'closed';
   o.closedAt = Date.now();
-  await idbPut('orders', o);
+  await sb.from('orders').update({ status:'closed', closed_at: new Date(o.closedAt).toISOString() }).eq('id', o.id);
   showToast('Заказ закрыт: '+money(orderTotal(o)));
   showScreen('orders');
 }
@@ -869,7 +857,7 @@ async function deleteCurrentOrder(){
   );
   if(!ok) return;
   state.orders = state.orders.filter(x=>x.id!==o.id);
-  await idbDelete('orders', o.id);
+  await sb.from('orders').delete().eq('id', o.id);
   showScreen(isOpen ? 'orders' : 'history');
 }
 
@@ -1008,7 +996,7 @@ function renderHistory(){
       const ok = await askConfirm('Удалить заказ?', 'Заказ будет удалён навсегда и исключён из статистики.', {danger:true, okLabel:'Удалить'});
       if(!ok) return;
       state.orders = state.orders.filter(o=>o.id!==id);
-      await idbDelete('orders', id);
+      await sb.from('orders').delete().eq('id', id);
       renderHistory();
     };
   });
@@ -1118,11 +1106,14 @@ function openCategoryForm(catId){
     const emoji = card.querySelector('#catEmoji').value.trim() || '🍽️';
     const group = card.querySelector('#catGroup').value;
     if(!name) return;
-    if(cat){ cat.name=name; cat.emoji=emoji; cat.group=group; await idbPut('categories',cat); }
-    else{
-      const newCat = { id:uid(), name, emoji, group };
-      state.categories.push(newCat);
-      await idbPut('categories', newCat);
+    if(cat){
+      cat.name=name; cat.emoji=emoji; cat.group=group;
+      await sb.from('categories').update({ name, emoji, grp: group }).eq('id', cat.id);
+    } else {
+      const { data, error } = await sb.from('categories')
+        .insert({ user_id: sbUser.id, name, emoji, grp: group })
+        .select().single();
+      if(!error && data) state.categories.push(catToApp(data));
     }
     closeModal(); renderMenu();
   };
@@ -1132,8 +1123,8 @@ async function deleteCategory(catId){
   const ok = await askConfirm('Удалить категорию?', items.length ? ('Вместе с ней будет удалено блюд: '+items.length+'.') : 'Категория пуста.', {danger:true, okLabel:'Удалить'});
   if(!ok) return;
   state.categories = state.categories.filter(c=>c.id!==catId);
-  await idbDelete('categories', catId);
-  for(const it of items){ state.items = state.items.filter(i=>i.id!==it.id); await idbDelete('items', it.id); }
+  state.items = state.items.filter(i=>i.categoryId!==catId);
+  await sb.from('categories').delete().eq('id', catId);
   renderMenu();
 }
 
@@ -1204,11 +1195,12 @@ function openItemForm(itemId, defaultCatId){
     if(!name || !categoryId) return;
     if(item){
       item.name=name; item.price=price; item.categoryId=categoryId; item.photo=photoData;
-      await idbPut('items', item);
+      await sb.from('items').update({ name, price, category_id: categoryId, photo: photoData }).eq('id', item.id);
     } else {
-      const newItem = { id:uid(), name, price, categoryId, photo:photoData };
-      state.items.push(newItem);
-      await idbPut('items', newItem);
+      const { data, error } = await sb.from('items')
+        .insert({ user_id: sbUser.id, category_id: categoryId, name, price, photo: photoData })
+        .select().single();
+      if(!error && data) state.items.push(itemToApp(data));
     }
     closeModal(); renderMenu();
   };
@@ -1217,7 +1209,7 @@ async function deleteItem(itemId){
   const ok = await askConfirm('Удалить блюдо?', 'Оно исчезнет из меню.', {danger:true, okLabel:'Удалить'});
   if(!ok) return;
   state.items = state.items.filter(i=>i.id!==itemId);
-  await idbDelete('items', itemId);
+  await sb.from('items').delete().eq('id', itemId);
   renderMenu();
 }
 
@@ -1225,24 +1217,32 @@ async function deleteItem(itemId){
 function openSettings(){
   const card = openModal(
     '<h2>Настройки</h2>' +
-    '<div class="field"><label>Имя официанта</label><input type="text" id="setName" value="'+esc(state.meta.ownerName)+'"></div>' +
-    '<div class="field"><label>Текущий PIN</label><input type="text" inputmode="numeric" maxlength="4" id="setPinOld" placeholder="••••"></div>' +
-    '<div class="field"><label>Новый PIN (необязательно)</label><input type="text" inputmode="numeric" maxlength="4" id="setPinNew" placeholder="••••"></div>' +
-    '<div class="modal-actions"><button class="btn btn-ghost" id="mCancel">Отмена</button><button class="btn btn-primary" id="mOk">Сохранить</button></div>'
+    '<div class="field"><label>Твоё имя</label><input type="text" id="setName" value="'+esc(state.meta.ownerName)+'"></div>' +
+    '<div class="field"><label>Новый пароль (необязательно)</label><input type="password" id="setPassNew" autocomplete="new-password" placeholder="Минимум 6 символов"></div>' +
+    '<div class="modal-actions">' +
+      '<button class="btn btn-danger" id="mLogout">Выйти из аккаунта</button>' +
+      '<button class="btn btn-ghost" id="mCancel">Отмена</button>' +
+      '<button class="btn btn-primary" id="mOk">Сохранить</button>' +
+    '</div>'
   );
   card.querySelector('#mCancel').onclick = closeModal;
+  card.querySelector('#mLogout').onclick = async ()=>{
+    const ok = await askConfirm('Выйти из аккаунта?', 'На этом телефоне нужно будет снова ввести имя пользователя и пароль.');
+    if(!ok) return;
+    await doSignOut();
+  };
   card.querySelector('#mOk').onclick = async ()=>{
     const name = card.querySelector('#setName').value.trim();
-    const oldPin = card.querySelector('#setPinOld').value.trim();
-    const newPin = card.querySelector('#setPinNew').value.trim();
-    if(newPin){
-      if(oldPin !== state.meta.pin){ showToast('Неверный текущий PIN'); return; }
-      if(!/^\d{4}$/.test(newPin)){ showToast('PIN должен быть из 4 цифр'); return; }
-      state.meta.pin = newPin;
+    const newPass = card.querySelector('#setPassNew').value;
+    if(newPass && newPass.length<6){ showToast('Пароль минимум 6 символов'); return; }
+    if(name && name!==state.meta.ownerName){
+      state.meta.ownerName = name;
+      await sb.from('profiles').update({ display_name: name }).eq('id', sbUser.id);
     }
-    if(name) state.meta.ownerName = name;
-    await idbPut('meta', state.meta);
-    document.getElementById('lockWho').textContent = 'Официант: ' + state.meta.ownerName;
+    if(newPass){
+      const { error } = await sb.auth.updateUser({ password: newPass });
+      if(error){ showToast('Не удалось сменить пароль'); return; }
+    }
     showToast('Настройки сохранены');
     closeModal();
   };
@@ -1253,10 +1253,6 @@ function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;
 
 /* ================= EVENTS ================= */
 function bindEvents(){
-  document.getElementById('numpad').addEventListener('click', e=>{
-    const btn = e.target.closest('button'); if(!btn) return;
-    handlePinKey(btn.dataset.k);
-  });
   document.getElementById('bottomNav').addEventListener('click', e=>{
     const btn = e.target.closest('button'); if(!btn) return;
     showScreen(btn.dataset.screen);
