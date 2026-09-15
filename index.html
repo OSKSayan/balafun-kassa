@@ -177,19 +177,20 @@ img{max-width:100%;}
 .summary-row .val{font-family:'Baloo 2';font-size:22px;font-weight:800;color:var(--accent);}
 .summary-actions{display:flex;gap:10px;}
 
-/* ---------- group tabs ---------- */
-.group-tabs{display:flex;gap:6px;margin-bottom:12px;background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:4px;}
-.grouptab{flex:1;border:none;background:none;color:var(--text-dim);font-weight:700;font-size:13.5px;padding:10px 8px;border-radius:11px;cursor:pointer;}
-.grouptab.active{background:linear-gradient(180deg,#ffd876,var(--accent));color:var(--accent-ink);}
-
-/* ---------- category chips ---------- */
-.chip-row{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 12px;margin:0 -2px;}
-.chip{
-  flex-shrink:0;padding:8px 14px;border-radius:999px;background:var(--surface-2);
-  border:1px solid var(--border);color:var(--text-dim);font-weight:600;font-size:13px;cursor:pointer;
-  display:flex;align-items:center;gap:6px;white-space:nowrap;
+/* ---------- picker tiles (group / category drill-down) ---------- */
+.tile-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.tile{
+  aspect-ratio:1.05;background:linear-gradient(160deg,var(--surface-2),var(--surface));
+  border:1px solid var(--border);border-radius:var(--r-lg);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  padding:12px;box-shadow:var(--shadow-sm);
 }
-.chip.active{background:linear-gradient(180deg,#ffd876,var(--accent));color:var(--accent-ink);border-color:transparent;}
+.tile:active{transform:scale(.96);}
+.tile .em{font-size:36px;}
+.tile .nm{font-family:'Baloo 2';font-weight:700;font-size:14.5px;text-align:center;line-height:1.2;}
+.tile-lg{aspect-ratio:.95;}
+.tile-lg .em{font-size:54px;}
+.tile-lg .nm{font-size:18px;}
 
 /* ---------- item grid ---------- */
 .item-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
@@ -443,17 +444,10 @@ img{max-width:100%;}
 
   <div class="overlay" id="pickerOverlay" hidden>
     <div class="overlay-header">
-      <button class="icon-btn" id="btnClosePicker">←</button>
-      <h1 style="font-size:18px;margin:0;">Добавить блюда</h1>
+      <button class="icon-btn" id="btnPickerBack">←</button>
+      <h1 style="font-size:18px;margin:0;" id="pickerTitle">Добавить блюда</h1>
     </div>
-    <div class="overlay-body">
-      <div class="group-tabs" id="pickerGroupTabs">
-        <button data-group="bar" class="grouptab">🧃 Бар меню</button>
-        <button data-group="kitchen" class="grouptab">🍽 Кухня меню</button>
-      </div>
-      <div class="chip-row" id="pickerChips"></div>
-      <div class="item-grid" id="pickerGrid"></div>
-    </div>
+    <div class="overlay-body" id="pickerBody"></div>
     <div class="overlay-footer">
       <div>
         <div style="font-size:11px;color:var(--text-dim);">В заказе</div>
@@ -505,6 +499,7 @@ let state = {
   orders: [],
   meta: { key:'settings', pin:'', ownerName:'', orderCounter:0, setupDone:false },
   currentOrderId: null,
+  pickerStep: 'groups',
   pickerGroup: 'bar',
   pickerCategoryId: null,
   menuOpenCategoryId: null,
@@ -870,62 +865,71 @@ async function deleteCurrentOrder(){
   showScreen(isOpen ? 'orders' : 'history');
 }
 
-/* ================= PICKER OVERLAY ================= */
+/* ================= PICKER OVERLAY (group -> category -> items drill-down) ================= */
 function openPicker(){
   document.getElementById('pickerOverlay').hidden = false;
-  const groupCats = state.categories.filter(c=>c.group===state.pickerGroup);
-  if(!state.pickerCategoryId || !groupCats.find(c=>c.id===state.pickerCategoryId)){
-    state.pickerCategoryId = groupCats.length ? groupCats[0].id : null;
-  }
-  renderPickerGroupTabs();
-  renderPickerChips();
-  renderPickerGrid();
+  state.pickerStep = 'groups';
+  renderPickerStep();
   renderPickerTotal();
 }
 function closePicker(){
   document.getElementById('pickerOverlay').hidden = true;
   renderOrderDetail();
 }
-function renderPickerGroupTabs(){
-  document.querySelectorAll('#pickerGroupTabs .grouptab').forEach(btn=>{
-    btn.classList.toggle('active', btn.dataset.group===state.pickerGroup);
-    btn.onclick = ()=>{
-      state.pickerGroup = btn.dataset.group;
-      const groupCats = state.categories.filter(c=>c.group===state.pickerGroup);
-      state.pickerCategoryId = groupCats.length ? groupCats[0].id : null;
-      renderPickerGroupTabs();
-      renderPickerChips();
-      renderPickerGrid();
-    };
-  });
+function pickerGoBack(){
+  if(state.pickerStep==='items'){ state.pickerStep='categories'; renderPickerStep(); }
+  else if(state.pickerStep==='categories'){ state.pickerStep='groups'; renderPickerStep(); }
+  else { closePicker(); }
 }
-function renderPickerChips(){
-  const wrap = document.getElementById('pickerChips');
-  const cats = state.categories.filter(c=>c.group===state.pickerGroup);
-  if(cats.length===0){
-    wrap.innerHTML = '<div class="empty" style="padding:16px 0;">Нет категорий в этом разделе</div>';
+function renderPickerStep(){
+  const title = document.getElementById('pickerTitle');
+  const body = document.getElementById('pickerBody');
+
+  if(state.pickerStep==='groups'){
+    title.textContent = 'Добавить блюда';
+    body.innerHTML = '<div class="tile-grid">' +
+      '<button class="tile tile-lg" data-group="bar"><span class="em">🧃</span><span class="nm">Бар меню</span></button>' +
+      '<button class="tile tile-lg" data-group="kitchen"><span class="em">🍽️</span><span class="nm">Кухня меню</span></button>' +
+    '</div>';
+    body.querySelectorAll('.tile').forEach(t=>{
+      t.onclick = ()=>{ state.pickerGroup = t.dataset.group; state.pickerStep = 'categories'; renderPickerStep(); };
+    });
     return;
   }
-  wrap.innerHTML = cats.map(c=>
-    '<button class="chip'+(c.id===state.pickerCategoryId?' active':'')+'" data-id="'+c.id+'">'+c.emoji+' '+esc(c.name)+'</button>'
-  ).join('');
-  wrap.querySelectorAll('.chip').forEach(ch=>{
-    ch.onclick = ()=>{ state.pickerCategoryId = ch.dataset.id; renderPickerChips(); renderPickerGrid(); };
-  });
-}
-function renderPickerGrid(){
+
+  if(state.pickerStep==='categories'){
+    title.textContent = state.pickerGroup==='bar' ? 'Бар меню' : 'Кухня меню';
+    const cats = state.categories.filter(c=>c.group===state.pickerGroup);
+    if(cats.length===0){
+      body.innerHTML = '<div class="empty">Нет категорий в этом разделе</div>';
+      return;
+    }
+    body.innerHTML = '<div class="tile-grid">' + cats.map(c=>
+      '<button class="tile" data-id="'+c.id+'"><span class="em">'+c.emoji+'</span><span class="nm">'+esc(c.name)+'</span></button>'
+    ).join('') + '</div>';
+    body.querySelectorAll('.tile').forEach(t=>{
+      t.onclick = ()=>{ state.pickerCategoryId = t.dataset.id; state.pickerStep = 'items'; renderPickerStep(); };
+    });
+    return;
+  }
+
+  // items
+  const cat = state.categories.find(c=>c.id===state.pickerCategoryId);
+  title.textContent = cat ? cat.name : 'Блюда';
   const items = state.items.filter(i=>i.categoryId===state.pickerCategoryId);
-  const grid = document.getElementById('pickerGrid');
-  if(items.length===0){ grid.innerHTML = '<div class="empty" style="grid-column:1/-1;">В этой категории пока нет блюд</div>'; return; }
-  grid.innerHTML = items.map(i=>{
+  if(items.length===0){
+    body.innerHTML = '<div class="empty">В этой категории пока нет блюд</div>';
+    return;
+  }
+  body.innerHTML = '<div class="item-grid">' + items.map(i=>{
     const thumb = i.photo ? '<img src="'+i.photo+'">' : categoryEmoji(i.categoryId);
     return '<button class="item-card" data-id="'+i.id+'">' +
       '<div class="thumb">'+thumb+'</div>' +
       '<div class="nm">'+esc(i.name)+'</div>' +
       '<div class="pr num">'+money(i.price)+'</div>' +
     '</button>';
-  }).join('');
-  grid.querySelectorAll('.item-card').forEach(el=>{
+  }).join('') + '</div>';
+  body.querySelectorAll('.item-card').forEach(el=>{
     el.onclick = ()=>{
       const item = state.items.find(i=>i.id===el.dataset.id);
       addLine(item);
@@ -1255,7 +1259,7 @@ function bindEvents(){
   document.getElementById('odLabel').onclick = renameOrder;
   document.getElementById('btnAddDishes').onclick = openPicker;
   document.getElementById('btnCloseOrder').onclick = closeCurrentOrder;
-  document.getElementById('btnClosePicker').onclick = closePicker;
+  document.getElementById('btnPickerBack').onclick = pickerGoBack;
   document.getElementById('btnPickerDone').onclick = closePicker;
   document.getElementById('btnAddCategory').onclick = ()=> openCategoryForm(null);
   document.getElementById('btnSettings').onclick = openSettings;
