@@ -489,6 +489,27 @@ const SEED = [
 ["Супы","🍜",[["Пельмени с бульоном",2500],["Рамен с пашотом",3300],["Суп-лапша по-домашнему",2100],["Суп фрикадельки с говядиной",2500],["Том-ям",3800],["Шурпа с говядиной",2500]]]
 ];
 
+const PHOTO_MAP = {
+  'Маргарита':'photos/margherita.jpg',
+  'Пепперони':'photos/pepperoni.jpg',
+  'Сырная':'photos/cheese-pizza.jpg',
+  'С сёмгой':'photos/salmon-pizza.jpg',
+  'Болоньезе':'photos/bolognese.jpg',
+  'Греческий':'photos/greek-salad.jpg',
+  'Цезарь с курицей':'photos/caesar-salad.jpg',
+  'Эспрессо':'photos/espresso.jpg',
+  'Капучино':'photos/cappuccino.jpg',
+  'Латте':'photos/latte.jpg',
+  'Калифорния':'photos/california-roll.jpg',
+  'Филадельфия':'photos/salmon-roll.jpg',
+  'Мохито':'photos/mojito.jpg',
+  'Том-ям':'photos/tom-yum.jpg',
+  'Наггетсы':'photos/nuggets.jpg',
+  'Картофель фри':'photos/fries.jpg',
+  'Бургер с говядиной':'photos/beef-burger.jpg',
+  'Ролл с лососем':'photos/salmon-roll.jpg'
+};
+
 const GROUP_MAP = {
   'Айс-латте':'bar','Лимонады':'bar','Молочные коктейли':'bar','Кофе':'bar','Чай':'bar','Прохладительные напитки':'bar',
   'Шашлыки':'kitchen','Сеты':'kitchen','Горячие блюда':'kitchen','Суши и роллы':'kitchen','Банкетное меню':'kitchen',
@@ -577,7 +598,7 @@ async function init(){
       state.categories.push(cat);
       await idbPut('categories', cat);
       for(const [dishName, price] of dishes){
-        const item = { id: uid(), categoryId: cat.id, name: dishName, price, photo: null };
+        const item = { id: uid(), categoryId: cat.id, name: dishName, price, photo: PHOTO_MAP[dishName] || null };
         state.items.push(item);
         await idbPut('items', item);
       }
@@ -586,6 +607,9 @@ async function init(){
   } else {
     for(const cat of state.categories){
       if(!cat.group){ cat.group = GROUP_MAP[cat.name] || 'kitchen'; await idbPut('categories', cat); }
+    }
+    for(const item of state.items){
+      if(!item.photo && PHOTO_MAP[item.name]){ item.photo = PHOTO_MAP[item.name]; await idbPut('items', item); }
     }
   }
 
