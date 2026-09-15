@@ -300,13 +300,16 @@ img{max-width:100%;}
 .modal-actions .btn{flex:1;}
 
 /* ---------- lock screen ---------- */
-#lockScreen{
+#lockScreen,#setupScreen{
   min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:24px;text-align:center;gap:6px;
 }
-#lockScreen .ufo{font-size:52px;margin-bottom:6px;}
-#lockScreen h1{font-size:24px;margin:0;font-weight:800;}
-#lockScreen .who{color:var(--text-dim);font-size:13.5px;margin-bottom:22px;}
+#lockScreen .ufo,#setupScreen .ufo{font-size:52px;margin-bottom:6px;}
+#lockScreen h1,#setupScreen h1{font-size:24px;margin:0;font-weight:800;}
+#lockScreen .who,#setupScreen .who{color:var(--text-dim);font-size:13.5px;margin-bottom:22px;}
+.setup-form{width:100%;max-width:320px;text-align:left;display:flex;flex-direction:column;gap:2px;}
+.setup-form .btn{margin-top:8px;}
+.setup-note{color:var(--text-faint);font-size:12px;margin-top:16px;max-width:280px;}
 .pin-dots{display:flex;gap:14px;margin-bottom:26px;}
 .pin-dots span{width:14px;height:14px;border-radius:50%;border:2px solid var(--border-strong);background:transparent;}
 .pin-dots span.filled{background:var(--accent);border-color:var(--accent);}
@@ -354,6 +357,19 @@ img{max-width:100%;}
       <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
       <button class="ghost" data-k="clear">Стереть</button><button data-k="0">0</button><button class="ghost" data-k="back">⌫</button>
     </div>
+  </div>
+
+  <div id="setupScreen" hidden>
+    <div class="ufo">🛸</div>
+    <h1>balaFUN Касса</h1>
+    <div class="who">Это твой первый вход — давай знакомиться</div>
+    <div class="setup-form">
+      <div class="field"><label>Твоё имя</label><input type="text" id="setupName" placeholder="Например: Данияр"></div>
+      <div class="field"><label>Придумай PIN (4 цифры)</label><input type="text" inputmode="numeric" maxlength="4" id="setupPin" placeholder="••••"></div>
+      <div class="field"><label>Повтори PIN</label><input type="text" inputmode="numeric" maxlength="4" id="setupPin2" placeholder="••••"></div>
+      <button class="btn btn-primary btn-block" id="btnSetupStart">Начать работу</button>
+    </div>
+    <div class="setup-note">Все твои заказы и настройки останутся только на этом телефоне.</div>
   </div>
 
   <div id="mainApp" hidden>
@@ -487,7 +503,7 @@ let state = {
   categories: [],
   items: [],
   orders: [],
-  meta: { key:'settings', pin:'0571', ownerName:'Саян', orderCounter:0 },
+  meta: { key:'settings', pin:'', ownerName:'', orderCounter:0, setupDone:false },
   currentOrderId: null,
   pickerGroup: 'bar',
   pickerCategoryId: null,
@@ -552,7 +568,10 @@ async function init(){
   ]);
   state.categories = cats; state.items = items; state.orders = orders;
   const metaRow = metaRows.find(m=>m.key==='settings');
-  if(metaRow) state.meta = metaRow;
+  if(metaRow){
+    if(metaRow.setupDone === undefined) metaRow.setupDone = true;
+    state.meta = metaRow;
+  }
 
   if(state.categories.length===0){
     for(const [catName, emoji, dishes] of SEED){
@@ -572,9 +591,34 @@ async function init(){
     }
   }
 
-  document.getElementById('lockWho').textContent = 'Официант: ' + state.meta.ownerName;
-  renderPinDots();
   bindEvents();
+  bindSetupEvents();
+  if(!state.meta.setupDone){
+    document.getElementById('lockScreen').hidden = true;
+    document.getElementById('setupScreen').hidden = false;
+  } else {
+    document.getElementById('lockWho').textContent = 'Официант: ' + state.meta.ownerName;
+    renderPinDots();
+  }
+}
+
+/* ================= FIRST-RUN SETUP ================= */
+function bindSetupEvents(){
+  document.getElementById('btnSetupStart').onclick = async ()=>{
+    const name = document.getElementById('setupName').value.trim();
+    const pin = document.getElementById('setupPin').value.trim();
+    const pin2 = document.getElementById('setupPin2').value.trim();
+    if(!name){ showToast('Введи своё имя'); return; }
+    if(!/^\d{4}$/.test(pin)){ showToast('PIN должен быть из 4 цифр'); return; }
+    if(pin !== pin2){ showToast('PIN не совпадает'); return; }
+    state.meta.ownerName = name;
+    state.meta.pin = pin;
+    state.meta.setupDone = true;
+    await idbPut('meta', state.meta);
+    document.getElementById('setupScreen').hidden = true;
+    document.getElementById('lockWho').textContent = 'Официант: ' + state.meta.ownerName;
+    unlock();
+  };
 }
 
 /* ================= LOCK SCREEN ================= */
