@@ -492,8 +492,6 @@ const SEED = [
 const PHOTO_MAP = {
   'Маргарита':'photos/margherita.jpg',
   'Пепперони':'photos/pepperoni.jpg',
-  'Сырная':'photos/cheese-pizza.jpg',
-  'С сёмгой':'photos/salmon-pizza.jpg',
   'Болоньезе':'photos/bolognese.jpg',
   'Греческий':'photos/greek-salad.jpg',
   'Цезарь с курицей':'photos/caesar-salad.jpg',
@@ -501,13 +499,9 @@ const PHOTO_MAP = {
   'Капучино':'photos/cappuccino.jpg',
   'Латте':'photos/latte.jpg',
   'Калифорния':'photos/california-roll.jpg',
-  'Филадельфия':'photos/salmon-roll.jpg',
   'Мохито':'photos/mojito.jpg',
   'Том-ям':'photos/tom-yum.jpg',
-  'Наггетсы':'photos/nuggets.jpg',
-  'Картофель фри':'photos/fries.jpg',
-  'Бургер с говядиной':'photos/beef-burger.jpg',
-  'Ролл с лососем':'photos/salmon-roll.jpg'
+  'Бургер с говядиной':'photos/beef-burger.jpg'
 };
 
 const GROUP_MAP = {
@@ -609,7 +603,13 @@ async function init(){
       if(!cat.group){ cat.group = GROUP_MAP[cat.name] || 'kitchen'; await idbPut('categories', cat); }
     }
     for(const item of state.items){
-      if(!item.photo && PHOTO_MAP[item.name]){ item.photo = PHOTO_MAP[item.name]; await idbPut('items', item); }
+      const mapped = PHOTO_MAP[item.name];
+      if(item.photo && item.photo.indexOf('photos/')===0){
+        if(mapped && item.photo!==mapped){ item.photo = mapped; await idbPut('items', item); }
+        else if(!mapped){ item.photo = null; await idbPut('items', item); }
+      } else if(!item.photo && mapped){
+        item.photo = mapped; await idbPut('items', item);
+      }
     }
   }
 
